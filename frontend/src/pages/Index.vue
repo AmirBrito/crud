@@ -1,49 +1,35 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+    <q-input label="email" v-model="email" />
+    <q-input label="senha" v-model="password" type="password"/>
+    <q-btn @click="onLogin" label="Login" />
   </q-page>
 </template>
 
-<script lang="ts">
-import { Todo, Meta } from 'components/models'
-import ExampleComponent from 'components/CompositionComponent.vue'
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRequest } from 'src/helper/RequestHelper'
+import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'PageIndex',
-  components: { ExampleComponent },
-  setup () {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1'
-      },
-      {
-        id: 2,
-        content: 'ct2'
-      },
-      {
-        id: 3,
-        content: 'ct3'
-      },
-      {
-        id: 4,
-        content: 'ct4'
-      },
-      {
-        id: 5,
-        content: 'ct5'
-      }
-    ])
-    const meta = ref<Meta>({
-      totalCount: 1200
+const router = useRouter()
+const $q = useQuasar()
+const email = ref<string>('')
+const password = ref<string>('')
+
+const onLogin = async () => {
+  try {
+    await useRequest.post('auth', {
+      email: email.value,
+      password: password.value
     })
-    return { todos, meta }
+    router.push('/home')
+  } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'Bad Request'
+    })
   }
-})
+}
+
 </script>
